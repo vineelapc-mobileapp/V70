@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Power Pulse - EEE Practice by Balaji Sir</title>
+<meta name="theme-color" content="#16274A">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="libs/katex/katex.min.css">
+<script>
+// If this page was opened directly (bookmarked/shared link, not via the
+// "Start Practice" card on the Power Pulse launcher), send the student
+// there first - the launcher should always be the first thing they see.
+if (!sessionStorage.getItem('cameFromLauncher')) {
+  window.location.replace('home.html');
+}
+</script>
+</head>
+<body>
+
+<header class="app-header">
+  <button id="headerBackBtn" class="icon-btn hidden" aria-label="Back" style="margin-right:2px;">
+    <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>
+  </button>
+  <a href="home.html" aria-label="Power Pulse Home" style="display:flex;align-items:center;text-decoration:none;">
+    <img src="icons/icon-192.png" alt="EE" style="width:30px;height:30px;border-radius:8px;">
+  </a>
+  <h1 id="headerTitle">EEE Practice</h1>
+  <button id="paletteToggleBtn" class="icon-btn hidden" aria-label="Question Palette">&#9638;</button>
+  <button id="headerProfileBtn" class="icon-btn" aria-label="Profile">
+    <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+  </button>
+</header>
+
+<div id="examStrip" class="exam-strip hidden">
+  <span id="examProgressText"></span>
+  <span id="stopwatchDisplay" class="stopwatch-pill" aria-label="Optional stopwatch">&#9201; 00:00</span>
+  <button id="calcToggleBtn" class="calc-toggle-btn" aria-label="Scientific calculator">&#128290;</button>
+  <span class="self-paced-tag">Self-paced</span>
+</div>
+
+<div id="calcDrawer" class="calc-drawer calc-closed">
+  <div class="calc-header">
+    <span>Scientific Calculator</span>
+    <button id="calcAngleModeBtn" class="calc-mode-btn">DEG</button>
+    <button id="calcCloseBtn" class="calc-close-btn" aria-label="Close calculator">&#10005;</button>
+  </div>
+  <div id="calcDisplay" class="calc-display">0</div>
+  <div class="calc-grid">
+    <button class="calc-btn calc-fn" data-fn="sin">sin</button>
+    <button class="calc-btn calc-fn" data-fn="cos">cos</button>
+    <button class="calc-btn calc-fn" data-fn="tan">tan</button>
+    <button class="calc-btn calc-op" data-val="(">(</button>
+    <button class="calc-btn calc-op" data-val=")">)</button>
+
+    <button class="calc-btn calc-fn" data-fn="log">log</button>
+    <button class="calc-btn calc-fn" data-fn="ln">ln</button>
+    <button class="calc-btn calc-fn" data-fn="sqrt">&#8730;</button>
+    <button class="calc-btn calc-op" data-val="^">x^y</button>
+    <button class="calc-btn calc-clear" data-action="clear">C</button>
+
+    <button class="calc-btn calc-num" data-val="7">7</button>
+    <button class="calc-btn calc-num" data-val="8">8</button>
+    <button class="calc-btn calc-num" data-val="9">9</button>
+    <button class="calc-btn calc-op" data-val="/">&#247;</button>
+    <button class="calc-btn calc-back" data-action="back">&#9003;</button>
+
+    <button class="calc-btn calc-num" data-val="4">4</button>
+    <button class="calc-btn calc-num" data-val="5">5</button>
+    <button class="calc-btn calc-num" data-val="6">6</button>
+    <button class="calc-btn calc-op" data-val="*">&#215;</button>
+    <button class="calc-btn calc-const" data-val="pi">&#960;</button>
+
+    <button class="calc-btn calc-num" data-val="1">1</button>
+    <button class="calc-btn calc-num" data-val="2">2</button>
+    <button class="calc-btn calc-num" data-val="3">3</button>
+    <button class="calc-btn calc-op" data-val="-">&#8722;</button>
+    <button class="calc-btn calc-const" data-val="e">e</button>
+
+    <button class="calc-btn calc-num" data-val="0">0</button>
+    <button class="calc-btn calc-num" data-val=".">.</button>
+    <button class="calc-btn calc-eq" data-action="equals">=</button>
+    <button class="calc-btn calc-op" data-val="+">+</button>
+    <button class="calc-btn calc-pct" data-val="%">%</button>
+  </div>
+</div>
+
+<main id="app"></main>
+
+<nav id="primaryTabBar" class="primary-tab-bar hidden" aria-label="Main sections">
+  <button id="tabHome" class="ptb-item" aria-label="Home">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h4.5v-5.5h4V20h4.5V10"/></svg>
+    <span>Home</span>
+  </button>
+  <button id="tabSubjects" class="ptb-item" aria-label="Subjects">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg>
+    <span>Subjects</span>
+  </button>
+  <button id="tabConcepts" class="ptb-item" aria-label="Concepts">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6v.5h5.4v-.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3Z"/></svg>
+    <span>Concepts</span>
+  </button>
+  <button id="tabTests" class="ptb-item" aria-label="Tests">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Z"/><path d="M15 2v5h5"/><path d="m8.5 14 2 2 4-4.2"/></svg>
+    <span>Tests</span>
+  </button>
+  <button id="tabPerformance" class="ptb-item" aria-label="Performance">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+    <span>Performance</span>
+  </button>
+</nav>
+<nav id="bottomNav" class="bottom-nav hidden" aria-label="Navigation">
+  <a href="home.html" id="homeBtn" class="bn-item bn-home" aria-label="Home">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h4.5v-5.5h4V20h4.5V10"/></svg>
+    <span>Home</span>
+  </a>
+  <button id="topicsBtn" class="bn-item hidden" aria-label="Topics">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg>
+    <span>Topics</span>
+  </button>
+  <button id="backBtn" class="bn-item" aria-label="Back">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>
+    <span>Back</span>
+  </button>
+  <button id="saveBtn" class="bn-save hidden" aria-label="Save answer">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+    <span id="saveBtnLabel">Save</span>
+  </button>
+  <button id="fwdBtn" class="bn-item" aria-label="Forward">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+    <span>Forward</span>
+  </button>
+</nav>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div id="paletteOverlay" class="palette-overlay hidden">
+  <div class="palette-sheet">
+    <div class="palette-header">
+      <h2>Question Palette</h2>
+      <button id="closePaletteBtn" class="icon-btn" aria-label="Close">&times;</button>
+    </div>
+    <div class="palette-legend">
+      <span><i class="dot dot-not-visited"></i>Not Visited</span>
+      <span><i class="dot dot-not-answered"></i>Not Answered</span>
+      <span><i class="dot dot-answered"></i>Answered</span>
+    </div>
+    <div id="paletteGrid" class="palette-grid"></div>
+    <button id="submitTestBtn" class="btn btn-primary full-width">Submit Test</button>
+  </div>
+</div>
+
+<div id="submitConfirmModal" class="modal hidden">
+  <div class="modal-box">
+    <h2>Submit Test?</h2>
+    <div id="submitSummary" class="submit-summary"></div>
+    <div class="modal-actions">
+      <button id="cancelSubmitBtn" class="btn btn-secondary">Continue Test</button>
+      <button id="confirmSubmitBtn" class="btn btn-primary">Yes, Submit</button>
+    </div>
+  </div>
+</div>
+
+<div id="videoPromptModal" class="modal hidden">
+  <div class="modal-box">
+    <h2>Video Solution</h2>
+    <p>That wasn't correct. Would you like to watch the video solution?</p>
+    <div class="modal-actions">
+      <button id="watchNowBtn" class="btn btn-primary">Watch Now</button>
+      <button id="watchAfterBtn" class="btn btn-secondary">After Test</button>
+    </div>
+  </div>
+</div>
+
+<div id="videoPlayerModal" class="modal hidden">
+  <div class="modal-box modal-video">
+    <div class="video-wrap">
+      <iframe id="videoFrame" src="" title="Video Solution" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <video id="videoFileEl" class="hidden" controls playsinline></video>
+    </div>
+    <button id="closeVideoBtn" class="btn btn-primary full-width">Done - Continue</button>
+  </div>
+</div>
+
+<script src="libs/katex/katex.min.js"></script>
+<script src="libs/katex/auto-render.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
